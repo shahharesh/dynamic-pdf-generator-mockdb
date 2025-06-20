@@ -25,7 +25,7 @@ function App() {
         currencyAmount: "USD 90,000.00",
         usdEquivalent: "USD 90,000.00",
         statusDecision: "Approved",
-        responseConditions: `We confirm that the corporate account for the above-named foreign investor is now approved in accordance with the regulations issued under the Capital Flows Administration & Management guidelines.`,
+        responseConditions: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent at erat in tellus elementum mollis. Donec efficitur scelerisque vestibulum. Quisque faucibus magna id ante tristique, vel imperdiet massa gravida. Ut libero mauris, interdum non mattis rhoncus, efficitur eu nunc. Fusce laoreet, nunc consequat cursus venenatis, urna ligula blandit quam, et fringilla purus risus eu mi. Ut porta quam quam, dapibus consequat urna ullamcorper in. Pellentesque scelerisque quam at tincidunt hendrerit. Donec posuere, augue quis luctus lobortis, quam neque sollicitudin ligula, sit amet porta turpis sem et leo. Curabitur in massa quis tortor ultrices consectetur. Suspendisse elementum venenatis enim, in facilisis purus. Curabitur in massa quis tortor ultrices consectetur. Suspendisse elementum venenatis enim, in facilisis purus. tortor ultrices consectetur. Suspendisse elementum venenatis enim, in facilisis purus. tortor ultrices consectetur. Suspendisse elementum venenatis enim, in facilisis purus. tortor ultrices consectetur.`,
       };
 
       const docDefinition = {
