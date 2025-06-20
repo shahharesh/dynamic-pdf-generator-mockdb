@@ -27,13 +27,13 @@ function App() {
 
       // Convert images to base64
       const headerBase64 = await getBase64FromURL(
-        "https://ibb.co/Ldqs5rDF"
+        "https://i.ibb.co/yFSpfy1/EC-Header.jpg"
       );
       const footerBase64 = await getBase64FromURL(
-        "https://ibb.co/YBZY0Y60"
+        "https://i.ibb.co/NZJYZSh/EC-Footer.jpg"
       );
       const signatureBase64 = await getBase64FromURL(
-        "https://ibb.co/x9Pm79M"
+        "https://i.ibb.co/0BcVjrr/signature.png"
       );
 
       const docDefinition = {
