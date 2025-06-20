@@ -4,117 +4,157 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 
 pdfMake.vfs = pdfFonts.vfs;
 
-const App = () => {
+const API_BASE = process.env.REACT_APP_API_BASE;
+
+const getBase64FromURL = async (url) => {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
+function App() {
   const generatePDF = async () => {
-    const response = await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:5000'}/api/pdfdata/latest`);
-    const data = await response.json();
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/pdfdata/latest`.replace(/([^:]\/)\/+/g, "$1")
+      );
+      const data = await response.json();
 
-    const docDefinition = {
-      pageMargins: [80, 120, 80, 100],
-      header: {
-        image: 'https://eurekasolutions.in/dynamicpdf/images/EC_Header.jpg',
-        width: 500,
-        alignment: 'center',
-        margin: [0, 20, 0, 20]
-      },
-      footer: function (currentPage, pageCount) {
-        return {
-          image: 'https://eurekasolutions.in/dynamicpdf/images/EC_Footer.jpg',
+      // Convert images to base64
+      const headerBase64 = await getBase64FromURL(
+        "https://eurekasolutions.in/dynamicpdf/images/EC_Header.jpg"
+      );
+      const footerBase64 = await getBase64FromURL(
+        "https://eurekasolutions.in/dynamicpdf/images/EC_Footer.jpg"
+      );
+      const signatureBase64 = await getBase64FromURL(
+        "https://eurekasolutions.in/dynamicpdf/images/signature.png"
+      );
+
+      const docDefinition = {
+        pageMargins: [80, 100, 60, 100], // left, top, right, bottom
+        header: {
+          image: "headerImage",
           width: 500,
-          alignment: 'center',
-          margin: [0, 0, 0, 20]
-        };
-      },
-      content: [
-        {
-          text: [
-            { text: `CFAAM Ref : ${data.CfaamRef}\n`, bold: true },
-            { text: `Previous CFAAM Ref : ${data.PreviousCfaamRef}\n\n`, bold: true }
-          ]
+          margin: [0, 20, 0, 30],
         },
-        {
-          text: "09 June 2025\n\nThe Manager\nTest Bank 123\n153 Josiah Chinamano Ave,\nEast,\n",
-        },
-        {
-          text: "HARARE\n\n",
-          bold: true,
-          decoration: "underline"
-        },
-        {
-          text: "RE: BANK ACCOUNTS / CORPORATE NON-RESIDENT ACCOUNT\n",
-          bold: true,
-          margin: [0, 10, 0, 4]
-        },
-        {
-          canvas: [{ type: "line", x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1 }],
-          margin: [0, 0, 0, 10]
-        },
-        {
-          text: [
-            { text: `Foreign Investor : `, bold: true },
-            { text: `${data.ForeignInvestor}\n` },
-
-            { text: `Date Submitted : `, bold: true },
-            { text: `${data.DateSubmitted}\n` },
-
-            { text: `Beneficiary and Country : `, bold: true },
-            { text: `${data.BeneficiaryCountry}\n` },
-
-            { text: `Currency and Amount : `, bold: true },
-            { text: `${data.CurrencyAmount}\n` },
-
-            { text: `USD Equivalent : `, bold: true },
-            { text: `${data.UsdEquivalent}\n` },
-
-            { text: `Status/Decision : `, bold: true },
-            { text: `${data.StatusDecision}\n\n` }
-          ]
-        },
-        {
-          text: "Response / Conditions",
-          bold: true,
-          margin: [0, 10, 0, 4]
-        },
-        {
-          text: data.ResponseConditions + "\n\n"
-        },
-        {
-          table: {
-            widths: ['*'],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: "Yours Faithfully,\n", margin: [0, 0, 0, 10] },
-                    {
-                      image: 'https://eurekasolutions.in/dynamicpdf/images/signature.png',
-                      width: 100,
-                      alignment: 'left',
-                      margin: [0, 0, 0, 10]
-                    },
-                    { text: "PDFCode Tester", fontSize: 10 },
-                    { text: "Principal Analyst", fontSize: 10 },
-                    {
-                      text: "CAPITAL FLOWS ADMINISTRATION, AND MANAGEMENT DIVISION",
-                      bold: true,
-                      fontSize: 11
-                    },
-                    {
-                      text: "(Foreign Trade and Investment Facilitation)",
-                      bold: true,
-                      fontSize: 11
-                    }
-                  ]
-                }
-              ]
-            ]
+        footer: (currentPage, pageCount) => ({
+          image: "footerImage",
+          width: 500,
+          margin: [0, 0, 0, 20],
+          alignment: "center",
+        }),
+        content: [
+          {
+            text: [
+              { text: "CFAAM Ref\t\t\t\t\t\t\t: ", bold: true },
+              { text: data.CfaamRef + "\n", bold: true },
+              { text: "Previous CFAAM Ref\t\t: ", bold: true },
+              { text: data.PreviousCfaamRef + "\n\n", bold: true },
+            ],
+            margin: [0, 0, 0, 20],
           },
-          layout: "noBorders"
-        }
-      ]
-    };
+          {
+            text: "09 June 2025",
+            margin: [0, 0, 0, 10],
+          },
+          {
+            text: [
+              "The Manager\nTest Bank 123\n153 Josiah Chinamano Ave,\nEast,\n",
+              { text: "HARARE\n\n", bold: true, decoration: "underline" },
+            ],
+          },
+          {
+            text: "RE: BANK ACCOUNTS / CORPORATE NON-RESIDENT ACCOUNT",
+            bold: true,
+            margin: [0, 10, 0, 4],
+          },
+          {
+            canvas: [{ type: "line", x1: 0, y1: 0, x2: 500, y2: 0, lineWidth: 1 }],
+            margin: [0, 2, 0, 15],
+          },
+          {
+            text: [
+              { text: "Foreign Investor\t\t\t\t\t: ", bold: true },
+              { text: data.ForeignInvestor + "\n", bold: true },
+              { text: "Date Submitted\t\t\t\t: ", bold: true },
+              { text: data.DateSubmitted + "\n", bold: true },
+              { text: "Beneficiary and Country\t: ", bold: true },
+              { text: data.BeneficiaryAndCountry + "\n", bold: true },
+              { text: "Currency and Amount\t\t: ", bold: true },
+              { text: data.CurrencyAndAmount + "\n", bold: true },
+              { text: "USD Equivalent\t\t\t\t: ", bold: true },
+              { text: data.USDEquivalent + "\n", bold: true },
+              { text: "Status/Decision\t\t\t\t: ", bold: true },
+              { text: data.StatusOrDecision + "\n\n", bold: true },
+            ],
+            margin: [0, 0, 0, 20],
+          },
+          {
+            text: "Response / Conditions",
+            bold: true,
+            margin: [0, 0, 0, 10],
+          },
+          {
+            text: data.ResponseOrConditions,
+            margin: [0, 0, 0, 30],
+          },
+          {
+            table: {
+              widths: ["*"],
+              body: [
+                [
+                  {
+                    stack: [
+                      { text: "Yours Faithfully,\n", margin: [0, 0, 0, 10] },
+                      {
+                        image: "signatureImage",
+                        width: 100,
+                        margin: [0, 0, 0, 10],
+                      },
+                      {
+                        text: [
+                          { text: "PDFCode Tester\n", fontSize: 9 },
+                          { text: "Principal Analyst\n", fontSize: 9 },
+                          {
+                            text:
+                              "CAPITAL FLOWS ADMINISTRATION, AND MANAGEMENT DIVISION\n",
+                            bold: true,
+                          },
+                          {
+                            text: "(Foreign Trade and Investment Facilitation)",
+                            bold: true,
+                          },
+                        ],
+                      },
+                    ],
+                    margin: [0, 10, 0, 0],
+                  },
+                ],
+              ],
+            },
+            layout: "noBorders",
+            unbreakable: true,
+            margin: [0, 10, 0, 0],
+          },
+        ],
+        images: {
+          headerImage: headerBase64,
+          footerImage: footerBase64,
+          signatureImage: signatureBase64,
+        },
+      };
 
-    pdfMake.createPdf(docDefinition).open();
+      pdfMake.createPdf(docDefinition).open();
+    } catch (error) {
+      console.error("PDF generation failed:", error);
+      alert("Something went wrong while generating the PDF.");
+    }
   };
 
   return (
@@ -122,6 +162,6 @@ const App = () => {
       <button onClick={generatePDF}>Generate PDF</button>
     </div>
   );
-};
+}
 
 export default App;
