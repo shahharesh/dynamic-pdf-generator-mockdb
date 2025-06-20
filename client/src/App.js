@@ -27,13 +27,13 @@ function App() {
 
       // Convert images to base64
       const headerBase64 = await getBase64FromURL(
-        "https://eurekasolutions.in/dynamicpdf/images/EC_Header.jpg"
+        "https://ibb.co/Ldqs5rDF"
       );
       const footerBase64 = await getBase64FromURL(
-        "https://eurekasolutions.in/dynamicpdf/images/EC_Footer.jpg"
+        "https://ibb.co/YBZY0Y60"
       );
       const signatureBase64 = await getBase64FromURL(
-        "https://eurekasolutions.in/dynamicpdf/images/signature.png"
+        "https://ibb.co/x9Pm79M"
       );
 
       const docDefinition = {
